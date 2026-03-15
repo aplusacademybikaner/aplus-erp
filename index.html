@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A PLUS ACADEMY - CLOUD SYSTEM</title>
+    <style>
+        /* --- STYLES --- */
+        :root { --primary: #004aad; --accent: #ffcc00; --light: #f4f6f8; --dark: #1a1a1a; --green: #27ae60; --red: #e74c3c; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--light); color: #333; }
+        
+        .top-bar { background: var(--primary); color: white; padding: 5px 20px; text-align: center; font-size: 0.9em; }
+        header { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 5%; }
+        .logo-text h1 { font-size: 1.5rem; color: var(--primary); margin: 0; }
+        
+        .main-nav button { background: none; border: none; font-weight: 600; padding: 10px 15px; cursor: pointer; color: #555; border-bottom: 3px solid transparent; }
+        .main-nav button.active { color: var(--primary); border-bottom: 3px solid var(--accent); }
+        .section-view { display: none; padding-bottom: 50px; }
+        .section-view.active { display: block; }
+        .container { max-width: 1000px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .loader { display:none; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* General UI */
+        .hero { background: linear-gradient(rgba(0,74,173,0.9), rgba(0,74,173,0.7)), url('https://source.unsplash.com/1600x900/?education'); background-size: cover; color: white; padding: 60px 20px; text-align: center; }
+        .ticker-box { background: var(--accent); color: black; padding: 10px; font-weight: bold; overflow: hidden; white-space: nowrap; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
+        button.btn { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; color: white; margin-top: 10px; }
+        .btn-primary { background: var(--primary); }
+        .btn-success { background: var(--green); }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .stat-card { padding: 20px; color: white; text-align: center; border-radius: 5px; }
+
+        @media print { .no-print, header, .top-bar { display: none !important; } .section-view { display: none !important; } #dashboard-view { display: block !important; } }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">Call us: +91 8094683633 | Visit: Near Old Jail, Bikaner</div>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo-section">
+                <div class="logo-text"><h1>A PLUS ACADEMY</h1><p>ONLINE CLOUD SYSTEM</p></div>
+            </div>
+            <nav class="main-nav">
+                <button onclick="switchTab('home-view')" class="active">Home</button>
+                <button onclick="switchTab('login-view')">Login</button>
+                <button onclick="switchTab('admin-view')">Admin</button>
+            </nav>
+        </div>
+    </header>
+
+    <div id="global-loader" class="loader"></div>
+
+    <div id="home-view" class="section-view active">
+        <div class="ticker-box"><marquee id="display_ticker">Loading Updates...</marquee></div>
+        <section class="hero"><h2>IGNITE YOUR POTENTIAL</h2><p>Premier Institute for NEET UG & Foundation</p></section>
+        <div class="container">
+            <h2 style="color:var(--primary);">Director's Message</h2>
+            <div style="background:#f9f9f9; padding:20px; border-left:5px solid var(--primary);">
+                <h3 id="display_dir_name">Loading...</h3>
+                <p id="display_dir_msg">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-view" class="section-view">
+        <div class="container" style="max-width: 400px; margin-top: 80px; text-align: center;">
+            <h2 style="color:var(--primary);">Student Login</h2>
+            <input type="text" id="loginId" placeholder="Enter Student ID (e.g. 101)">
+            <button class="btn btn-primary" onclick="handleLogin()">View Result & Fees</button>
+            <p id="loginMsg" style="margin-top:10px; font-weight:bold;"></p>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="section-view">
+        <div class="container">
+            <div style="display:flex; justify-content:space-between;">
+                <h2 id="d_name">Student Name</h2>
+                <button class="no-print btn btn-primary" style="width:auto;" onclick="window.print()">Print</button>
+            </div>
+            <p><strong>ID:</strong> <span id="d_id">--</span> | <strong>Course:</strong> <span id="d_course">--</span></p>
+            <hr style="margin:20px 0;">
+            <div class="stat-grid">
+                <div class="stat-card" style="background:var(--primary);"><h3>Total Fee</h3><div style="font-size:1.5em;" id="d_total">0</div></div>
+                <div class="stat-card" style="background:var(--green);"><h3>Paid</h3><div style="font-size:1.5em;" id="d_paid">0</div></div>
+                <div class="stat-card" style="background:var(--red);"><h3>Due</h3><div style="font-size:1.5em;" id="d_due">0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-view" class="section-view">
+        <div class="container">
+            <h2 style="color:var(--primary);">Admin Panel (Live Database)</h2>
+            
+            <div style="background:#eef5fb; padding:15px; margin-bottom:20px; border-radius:5px;">
+                <h3>🌐 Update Website Content</h3>
+                <input type="text" id="edit_dir_name" placeholder="Director Name">
+                <input type="text" id="edit_dir_msg" placeholder="Director Message">
+                <input type="text" id="edit_ticker" placeholder="Ticker Text">
+                <button class="btn btn-success" onclick="saveConfig()">Update Content</button>
+            </div>
+
+            <div style="background:#f9f9f9; padding:15px; border-radius:5px;">
+                <h3>🎓 Add / Update Student</h3>
+                <div class="form-grid">
+                    <input type="text" id="a_id" placeholder="ID (Required)">
+                    <input type="text" id="a_name" placeholder="Name">
+                    <input type="text" id="a_course" placeholder="Course">
+                    <input type="number" id="a_total" placeholder="Total Fee">
+                    <input type="number" id="a_paid" placeholder="Paid Fee">
+                </div>
+                <button class="btn btn-primary" onclick="saveStudent()">Save to Cloud Database</button>
+            </div>
+            <p id="adminMsg" style="margin-top:10px; font-weight:bold; color:green;"></p>
+        </div>
+    </div>
+
+    <script>
+        // ******************************************************
+        // ⚠️ PASTE YOUR GOOGLE SCRIPT URL BELOW ⚠️
+        const API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE"; 
+        // ******************************************************
+
+        // --- NAVIGATION ---
+        function switchTab(id) {
+            document.querySelectorAll('.section-view').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.main-nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showLoader(show) {
+            document.getElementById('global-loader').style.display = show ? 'block' : 'none';
+        }
+
+        // --- 1. LOAD WEBSITE CONTENT (Auto) ---
+        window.onload = function() {
+            if(API_URL.includes("PASTE")) { alert(https://script.google.com/macros/s/AKfycbwuj1c6nWPSvRT4YQ-2Dc6yQExEQTfXtWUWskD33VtwkJAmc0OV_IsCTF8vUWnqmUad/exec); return; }
+            fetchConfig();
+        }
+
+        function fetchConfig() {
+            fetch(API_URL + "?action=getConfig")
+            .then(res => res.json())
+            .then(data => {
+                // Public
+                document.getElementById('display_dir_name').innerText = data.dirName;
+                document.getElementById('display_dir_msg').innerText = data.dirMsg;
+                document.getElementById('display_ticker').innerText = data.ticker;
+                // Admin
+                document.getElementById('edit_dir_name').value = data.dirName;
+                document.getElementById('edit_dir_msg').value = data.dirMsg;
+                document.getElementById('edit_ticker').value = data.ticker;
+            });
+        }
+
+        // --- 2. STUDENT LOGIN (GET) ---
+        function handleLogin() {
+            const id = document.getElementById('loginId').value;
+            if(!id) return;
+            showLoader(true);
+            document.getElementById('loginMsg').innerText = "Searching Database...";
+
+            fetch(API_URL + "?action=login&id=" + id)
+            .then(res => res.json())
+            .then(result => {
+                showLoader(false);
+                if(result.status === "success") {
+                    const s = result.data;
+                    document.getElementById('d_name').innerText = s.name;
+                    document.getElementById('d_id').innerText = s.id;
+                    document.getElementById('d_course').innerText = s.course;
+                    document.getElementById('d_total').innerText = "₹" + s.total;
+                    document.getElementById('d_paid').innerText = "₹" + s.paid;
+                    document.getElementById('d_due').innerText = "₹" + (s.total - s.paid);
+                    document.getElementById('loginMsg').innerText = "";
+                    switchTab('dashboard-view');
+                } else {
+                    document.getElementById('loginMsg').innerText = "❌ Student ID Not Found";
+                }
+            });
+        }
+
+        // --- 3. SAVE STUDENT (POST) ---
+        function saveStudent() {
+            const data = {
+                action: "saveStudent",
+                id: document.getElementById('a_id').value,
+                name: document.getElementById('a_name').value,
+                course: document.getElementById('a_course').value,
+                total: document.getElementById('a_total').value,
+                paid: document.getElementById('a_paid').value
+            };
+            
+            if(!data.id || !data.name) { alert("ID and Name are required"); return; }
+            showLoader(true);
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors", // Important for Google Script
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            }).then(() => {
+                showLoader(false);
+                alert("Student Saved to Cloud!");
+                document.getElementById('a_id').value = "";
+                document.getElementById('a_name').value = "";
+            });
+        }
+
+        // --- 4. SAVE CONFIG (POST) ---
+        function saveConfig() {
+            const data = {
+                action: "saveConfig",
+                dirName: document.getElementById('edit_dir_name').value,
+                dirMsg: document.getElementById('edit_dir_msg').value,
+                ticker: document.getElementById('edit_ticker').value
+            };
+            showLoader(true);
+            
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            }).then(() => {
+                showLoader(false);
+                alert("Website Content Updated!");
+                fetchConfig(); // Refresh view
+            });
+        }
+    </script>
+</body>
+</html>
